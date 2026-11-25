@@ -13,6 +13,7 @@ const summaryColumns =
   "id,name,address,filename,mime,parts,state,phase,progress,revision";
 const versionById = new Map(),
   writes = new Map();
+let lastWake = 0;
 let cloudUser,
   jobTimer,
   cloudSync = "Saved to workspace",
@@ -231,6 +232,10 @@ async function openCloud(id, navigate = true) {
   if (cloudSelection !== id) return;
   localSet("raumscan-cloud-current", id);
   if (row.state !== "ready") {
+    if (row.state === "queued" && Date.now() - lastWake > 90000) {
+      lastWake = Date.now();
+      cloudAPI("wake", { id }).catch(() => {});
+    }
     const isUpload = row.state === "uploading",
       isFailed = row.state === "failed";
     modal(
@@ -259,6 +264,7 @@ async function openCloud(id, navigate = true) {
       $("#retry-job").onclick = async () => {
         try {
           checked(await client.rpc("retry_scan", { scan_id: id }));
+          await cloudAPI("wake", { id });
           await openCloud(id);
         } catch (e) {
           fail(e);
@@ -357,7 +363,7 @@ async function uploadCloud(file, name, address, markers) {
         }
         $("#up-bar").value = (100 * (i + 1)) / parts;
       }
-      checked(await client.rpc("submit_scan", { scan_id: id }));
+      await cloudAPI("enqueue", { id });
     }
     memoryVideos.set(id, file);
     chosenFile = null;
