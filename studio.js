@@ -1971,6 +1971,9 @@ async function exportAction(kind) {
 async function testRecording() {
   const button = $('[data-act="test-video"]');
   button.disabled = true;
+  const submit = $("#new-project button[type=submit]");
+  submit.disabled = true;
+  button.textContent = "Loading test recording…";
   try {
     const response = await fetch(asset("test-scan.mp4"));
     if (!response.ok) throw Error("The sample recording is unavailable.");
@@ -1984,6 +1987,8 @@ async function testRecording() {
     toast("Test recording ready. The two rooms each measure 4 × 4 m.");
   } finally {
     button.disabled = false;
+    submit.disabled = false;
+    button.textContent = "Use a two-room test recording ↗";
   }
 }
 const actions = {
