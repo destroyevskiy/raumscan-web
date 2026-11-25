@@ -1836,6 +1836,10 @@ async function editPhoto(id) {
   };
 }
 async function stageGenerate() {
+  if (hosted && connected && !cloudUser) {
+    workspaceDialog(stageGenerate);
+    return;
+  }
   if (!connected) {
     connectDialog();
     return;
@@ -1885,6 +1889,10 @@ async function runStage() {
   }
 }
 function batchStageDialog() {
+  if (hosted && connected && !cloudUser) {
+    workspaceDialog(batchStageDialog);
+    return;
+  }
   const chosen = p.photos.filter((f) => f.selected);
   if (!chosen.length) {
     toast("Select photographs in Photography first.");
@@ -1906,7 +1914,7 @@ function batchStageDialog() {
       " selected photographs. Each room uses its own furniture reference across views.</p>" +
       msg(
         count +
-          " new image edits will use your connected OpenAI account. Existing views in this style are reused. Completed images are saved as each one finishes.",
+          " new image edits will use the studio’s connected OpenAI account. Existing views in this style are reused. Completed images are saved as each one finishes.",
       ) +
       '<div class="form-footer">' +
       btn("Stage selected photographs", "run-batch", "stage", "primary") +

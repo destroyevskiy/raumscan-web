@@ -232,7 +232,10 @@ async function openCloud(id, navigate = true) {
   if (cloudSelection !== id) return;
   localSet("raumscan-cloud-current", id);
   if (row.state !== "ready") {
-    if (row.state === "queued" && Date.now() - lastWake > 90000) {
+    if (
+      ["queued", "working"].includes(row.state) &&
+      Date.now() - lastWake > 90000
+    ) {
       lastWake = Date.now();
       cloudAPI("wake", { id }).catch(() => {});
     }
