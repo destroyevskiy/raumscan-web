@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#172720" />
+    <title>Raumscan Studio</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="studio.css" />
+  </head>
+  <body>
+    <a class="skip" href="#content">Skip to project</a>
+    <div id="shell">
+      <aside id="rail"></aside>
+      <div class="workspace">
+        <header id="bar"></header>
+        <main id="content" tabindex="-1"></main>
+      </div>
+    </div>
+    <dialog id="modal"><div id="modal-body"></div></dialog>
+    <div id="toasts" role="status" aria-live="polite"></div>
+    <script src="vendor/jszip.min.js"></script>
+    <script src="vendor/pdf-lib.min.js"></script>
+    <script src="model.js"></script>
+    <script src="media.js"></script>
+    <script src="exports.js"></script>
+    <script src="vendor/supabase.min.js"></script>
+    <script src="cloud.js"></script>
+    <script src="studio.js"></script>
+  </body>
+</html>
