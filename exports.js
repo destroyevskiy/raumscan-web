@@ -69,15 +69,8 @@ function planCaption(p) {
 function descriptionFor(p) {
   if (p.description) return p.description;
   const de = p.language === "de",
-    names = p.rooms.map((r) => r.name),
-    types = {
-      "Living room": "Wohnzimmer",
-      Bedroom: "Schlafzimmer",
-      Kitchen: "Küche",
-      Hallway: "Flur",
-      Bathroom: "Badezimmer",
-    };
-  let place = p.address ? (de ? " in " : " in ") + p.address : "";
+    names = p.rooms.map((r) => exportRoomName(p, r.name));
+  const place = p.address ? " in " + p.address : "";
   if (de) {
     return (
       "Diese Wohnung" +
@@ -87,7 +80,7 @@ function descriptionFor(p) {
       ". " +
       (names.length
         ? "Der Grundriss umfasst " +
-          names.map((n) => types[n] || n).join(", ") +
+          names.join(", ") +
           ". "
         : "") +
       (p.planVerified
