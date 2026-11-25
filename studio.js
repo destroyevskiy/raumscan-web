@@ -625,7 +625,9 @@ function stagePage() {
       f.name,
       "stage",
       result
-        ? '<span class="badge">Virtually staged</span>'
+        ? p.staged[f.id]?.kind === "concept"
+          ? '<span class="badge">Furnishing concept</span>'
+          : '<span class="badge">Virtually staged</span>'
         : '<span class="stamp">Source frame</span>',
     ) +
     '<div class="stage-preview" style="--cut:43%"><img src="' +
@@ -683,11 +685,26 @@ function stagePage() {
       ? p.staged[f.id]?.use && p.staged[f.id]?.style === style
         ? btn("Use original in exposé", "use-original", "image")
         : btn("Use in exposé", "use-stage", "check", "primary")
-      : btn("Generate staged view", "generate-stage", "stage", "primary")) +
-    btn("Stage selected photos", "batch-stage", "layers") +
+      : btn(
+          hosted ? "Design with Claude" : "Generate staged view",
+          "generate-stage",
+          "stage",
+          "primary",
+        )) +
+    (hosted ? btn("Arrange furniture", "arrange-furniture", "edit") : "") +
+    btn(
+      hosted ? "Design selected photos" : "Stage selected photos",
+      "batch-stage",
+      "layers",
+    ) +
+    (hosted && p.designs?.[roomDesignKey(f)]?.note
+      ? msg(p.designs[roomDesignKey(f)].note)
+      : "") +
     (p.example
       ? "<p>Two prebuilt living-room styles are included. Additional views use the connected AI service.</p>"
-      : "<p>Frames assigned to the same room use its existing staged view as a furniture reference.</p>") +
+      : hosted
+        ? "<p>Claude chooses furnishings from your photographs. The studio renders a labelled concept using the same furniture across views.</p>"
+        : "<p>Frames assigned to the same room use its existing staged view as a furniture reference.</p>") +
     "</section></div>"
   );
 }
@@ -1296,7 +1313,7 @@ async function connectionStatus() {
     try {
       const status = await cloudAPI("status");
       processorOnline = status.geometry;
-      return status.staging;
+      return status.provider === "anthropic" && status.staging;
     } catch {
       return false;
     }
@@ -1324,8 +1341,8 @@ function connectDialog() {
         ) +
         msg(
           connected
-            ? "Virtual staging is available for your photographs."
-            : "Virtual staging is in preview. The sample includes two furnished views. Generating new views requires the studio owner to connect an image provider.",
+            ? "Claude is configured. Choose a room photograph and style to generate a furnishing concept."
+            : "The studio is waiting for its Anthropic API key. You can place furniture yourself now. Claude adds furniture suggestions after the owner connects the key.",
         ) +
         "</div>",
     );
@@ -1836,10 +1853,7 @@ async function editPhoto(id) {
   };
 }
 async function stageGenerate() {
-  if (hosted && connected && !cloudUser) {
-    workspaceDialog(stageGenerate);
-    return;
-  }
+  if (hosted) return confirmDesign(false);
   if (!connected) {
     connectDialog();
     return;
@@ -1889,10 +1903,7 @@ async function runStage() {
   }
 }
 function batchStageDialog() {
-  if (hosted && connected && !cloudUser) {
-    workspaceDialog(batchStageDialog);
-    return;
-  }
+  if (hosted) return confirmDesign(true);
   const chosen = p.photos.filter((f) => f.selected);
   if (!chosen.length) {
     toast("Select photographs in Photography first.");
@@ -2001,6 +2012,7 @@ async function testRecording() {
 }
 const actions = {
   "test-video": testRecording,
+  "arrange-furniture": () => arrangeFurniture().catch(fail),
   new: () => newScan(),
   "dismiss-plan": () => {
     closeModal();

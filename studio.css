@@ -1812,3 +1812,4 @@ dialog::backdrop {
     transition: none !important;
   }
 }
+.furniture-canvas {display:block;width:auto;max-width:100%;height:auto;justify-self:center;cursor:crosshair;border-radius:6px;background:#1a261f}
