@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: raumscan-studio
+    runtime: docker
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    envVars:
+      - key: RAUMSCAN_WORKER_TOKEN
+        generateValue: true
+      - key: RAUMSCAN_WORKER_API
+        value: https://sibcbqvatdnwsvqstvpg.supabase.co/functions/v1/studio
